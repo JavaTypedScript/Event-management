@@ -52,4 +52,39 @@ const approveEvent = async(req,res) => {
     res.json(event);
 };
 
-module.exports = {createEvent,approveEvent};
+// @desc Get public approved events
+// @route   GET/api/events
+// @access Public
+const getPublicEvents = async(req,res) => {
+    try {
+        const {search,club,startDate,endDate} = req.query;
+
+        let query = {
+            status:'approved',
+            visibility:'public',
+        }
+
+        if(search){
+            query.title = {$regex:search,$options:'i'};
+        }
+
+        if(club){
+            query.organizer = club;
+        }
+
+        if(startDate || endDate){
+            query.startDate = {};
+            if(startDate) query.startDate.$gte = new Date(startDate);
+            if(endDate) query.endDate.$lte = new Date(endDate);
+        }
+
+        const events = (await Event.find(query).populate('organizer','name department').populate('venue','name')).sort({startDate:1});
+
+        res.json(events);
+
+    } catch (error) {
+        res.status(500).json({message:error.message});
+    }
+}
+
+module.exports = {createEvent,approveEvent,getPublicEvents};
