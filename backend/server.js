@@ -20,7 +20,7 @@ app.use(cors({
     // List of explicitly allowed domains
     const allowedOrigins = [
       "http://localhost:5173",
-      "https://event-management-eventify.vercel.app", // Your MAIN production URL (Check Vercel Dashboard for exact name)
+      "https://event-management-kappa-neon.vercel.app/", // Your MAIN production URL (Check Vercel Dashboard for exact name)
     ];
 
     // Check if origin is in the allowed list OR if it matches a Vercel preview URL
@@ -47,7 +47,7 @@ app.use('/api/clubs', require('./routers/clubRoutes'));
 
 const allowedOrigins = [
       "http://localhost:5173",
-      "https://event-management-eventify.vercel.app", // Your MAIN production URL (Check Vercel Dashboard for exact name)
+      "https://event-management-kappa-neon.vercel.app/", // Your MAIN production URL (Check Vercel Dashboard for exact name)
 ];
 
 // socket.io
