@@ -11,25 +11,31 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 
-const allowedOrigins = [
-  "http://localhost:5173", // Keep this for local development
-  "https://event-management-eventify-gom9hro5s-javatypedscripts-projects.vercel.app", // <--- ADD THIS (From your error)
-  "https://event-management-eventify.vercel.app" // Add your main production domain too if you have one
-];
 
 app.use(cors({
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.indexOf(origin) === -1) {
+
+    // List of explicitly allowed domains
+    const allowedOrigins = [
+      "http://localhost:5173",
+      "https://event-management-eventify.vercel.app", // Your MAIN production URL (Check Vercel Dashboard for exact name)
+    ];
+
+    // Check if origin is in the allowed list OR if it matches a Vercel preview URL
+    const isAllowed = allowedOrigins.includes(origin) || origin.endsWith('.vercel.app');
+
+    if (isAllowed) {
+      return callback(null, true);
+    } else {
       const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
       return callback(new Error(msg), false);
     }
-    return callback(null, true);
   },
   credentials: true
 }));
+
 app.use(express.json());
 
 app.use('/api/auth', require('./routers/authRoutes'));
