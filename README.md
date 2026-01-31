@@ -2,6 +2,7 @@
 ## Hosted URL: https://event-management-kappa-neon.vercel.app/
 ## Admin Credentials
 ```
-   bash
+  bash
+  cd backend
   node config/seed.js
 ```
