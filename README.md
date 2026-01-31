@@ -2,6 +2,6 @@
 ## Hosted URL: https://event-management-kappa-neon.vercel.app/
 ## Admin Credentials
 ```
-   Email:admin@campus.com
-   Password:admin123
+   bash
+  node config/seed.js
 ```
