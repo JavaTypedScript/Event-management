@@ -52,10 +52,20 @@ const allowedOrigins = [
 
 // socket.io
 const io = new Server(server,{
-    cors:{
-        origin:allowedOrigins,
-        methods:["GET","POST"],
-    }
+    pingTimeout: 60000,
+  cors: {
+    // Allow any Vercel app to connect to Sockets
+    origin: (origin, callback) => {
+      const isAllowed = allowedOrigins.includes(origin) || (origin && origin.endsWith(".vercel.app"));
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST"],
+    credentials: true,
+},
 });
 
 io.on('connection',(socket)=>{
