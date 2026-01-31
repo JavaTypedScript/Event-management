@@ -45,6 +45,10 @@ app.use('/api/chat', require('./routers/chatRoutes'));
 app.use('/api/analytics', require('./routers/analyticsRoutes'));
 app.use('/api/clubs', require('./routers/clubRoutes'));
 
+const allowedOrigins = [
+      "http://localhost:5173",
+      "https://event-management-eventify.vercel.app", // Your MAIN production URL (Check Vercel Dashboard for exact name)
+];
 
 // socket.io
 const io = new Server(server,{
