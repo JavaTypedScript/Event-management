@@ -11,7 +11,10 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 
-app.use(cors());
+app.use(cors({
+    origin:"*",
+    credentials:true,
+}));
 app.use(express.json());
 
 app.use('/api/auth', require('./routers/authRoutes'));
@@ -23,6 +26,7 @@ app.use('/api/clubs', require('./routers/clubRoutes'));
 
 // socket.io
 const io = new Server(server,{
+    pingTimeout:60000,
     cors:{
         origin:"*",
         methods:["GET","POST"],
