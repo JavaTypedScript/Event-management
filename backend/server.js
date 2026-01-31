@@ -11,9 +11,11 @@ connectDB();
 const app = express();
 const server = http.createServer(app);
 
+const allowedOrigins = ["https://campus-events.vercel.app", "http://localhost:5173"];
+
 app.use(cors({
-    origin:"*",
-    credentials:true,
+  origin: allowedOrigins,
+  credentials: true
 }));
 app.use(express.json());
 
@@ -24,11 +26,11 @@ app.use('/api/chat', require('./routers/chatRoutes'));
 app.use('/api/analytics', require('./routers/analyticsRoutes'));
 app.use('/api/clubs', require('./routers/clubRoutes'));
 
+
 // socket.io
 const io = new Server(server,{
-    pingTimeout:60000,
     cors:{
-        origin:"*",
+        origin:allowedOrigins,
         methods:["GET","POST"],
     }
 });
