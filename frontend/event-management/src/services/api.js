@@ -1,8 +1,25 @@
 import axios from 'axios';
 
-// Create an axios instance
+console.log("VITE_API_URL Environment Variable:", import.meta.env.VITE_API_URL);
+
+let API_URL = import.meta.env.VITE_API_URL;
+
+// SAFETY CHECK: If we are in production (deployed), NEVER use localhost.
+if (import.meta.env.PROD && !API_URL) {
+  console.error("CRITICAL: API URL is missing in production build!");
+  // Fallback to your Render URL explicitly if the env var fails
+  API_URL = 'https://event-management-4avy.onrender.com/api';
+}
+
+// Fallback for local development
+if (!API_URL) {
+  API_URL = 'http://localhost:5000/api';
+}
+
+console.log("Using API URL:", API_URL);
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api', // Auto-switches on deploy
+  baseURL: API_URL,
   withCredentials: true,
 });
 
