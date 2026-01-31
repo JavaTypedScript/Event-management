@@ -11,7 +11,7 @@ import { Send, MessageSquare } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 
 // Connect to root URL (remove /api if present)
-const ENDPOINT = import.meta.env.VITE_API_URL?.replace('/api', '') || "http://localhost:5000";
+const ENDPOINT = import.meta.env.VITE_API_URL?.replace('/api', '') ;
 let socket;
 
 const ChatPage = () => {
