@@ -17,12 +17,15 @@ const eventSchema = new mongoose.Schema({
     venue:{
         type:mongoose.Schema.Types.ObjectId,ref:'Resource'
     },
-    budget: Number,
+    budget: { type: Number, default: 0 },
     visibility: {
         type: String,
         enum: ['public','internal'],
         default: 'public',
     },
+    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    hostingClub: { type: String },
+    
 },{ timestamps: true });
 
 module.exports = mongoose.model('Event',eventSchema);

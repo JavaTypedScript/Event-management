@@ -83,4 +83,22 @@ const bookResource = async (req,res) => {
     }
 }
 
-module.exports = {getAllResources,checkAvailabilty,bookResource};
+const hasConflict = async(resourceId,instances) => {
+    for(const instance of instances) {
+        const conflict = await Resource.findOne({
+            _id:resourceId,
+            bookings:{
+                $eleMatch:{
+                    startTime:{$lt:instance.end},
+                    endTime:{$gt:instance.start},
+                }
+            }
+        });
+        if(conflict){
+            return true;
+        }
+        return false;
+    }
+}
+
+module.exports = {getAllResources,checkAvailabilty,bookResource,hasConflict};

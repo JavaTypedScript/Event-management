@@ -14,8 +14,12 @@ const server = http.createServer(app);
 app.use(cors());
 app.use(express.json());
 
-//app.use('api/auth')
-// routes
+app.use('/api/auth', require('./routers/authRoutes'));
+app.use('/api/events', require('./routers/eventRoutes'));
+app.use('/api/resources', require('./routers/resourceRoutes'));
+app.use('/api/chat', require('./routers/chatRoutes'));
+app.use('/api/analytics', require('./routers/analyticsRoutes'));
+app.use('/api/clubs', require('./routers/clubRoutes'));
 
 // socket.io
 const io = new Server(server,{
@@ -31,6 +35,36 @@ io.on('connection',(socket)=>{
     socket.on('join_room',(room)=>{
         socket.join(room);
     });
+
+    socket.on('join_chat',(chat)=>{
+        socket.join(chat);
+        console.log(`User joined room: ${chat}`);
+    });
+
+    socket.on('new_message', async (newMessageReceived) => {
+        const {conversationId,senderId,text} = newMessageReceived;
+
+        const Message = require('./models/Message');
+        const Conversation = require('./models/Conversation');
+
+            try {
+                const savedMsg = await Message.create({
+                    conversationId,
+                    sender: senderId,
+                    text
+                });
+
+                await Conversation.findByIdAndUpdate(conversationId,{
+                    lastMessage: text,
+                    lastMessageAt: Date.now()
+                });
+
+                socket.to(conversationId).emit("message_received", savedMsg);
+
+            } catch (error) {
+                console.error(error);
+            }
+    })
 
     socket.on('send_message',(message)=>{
         socket.to(message.room).emit('receive_message',message);

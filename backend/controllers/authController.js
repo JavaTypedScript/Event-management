@@ -72,6 +72,7 @@ const loginUser = async(req,res) => {
                 name: user.name,
                 email: user.email,
                 role: user.role,
+                managedClub: user.managedClub,
                 token: generateToken(user._id)
             });
         } else {
@@ -92,4 +93,65 @@ const getMe = async (req,res) => {
     res.status(200).json(req.user);
 }
 
-module.exports = {registerUser,loginUser,getMe};
+// @desc    Get all users (for admin list)
+// @route   GET /api/auth/users
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}).select('-password'); // Don't send passwords
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Update user role & club assignment
+// @route   PUT /api/auth/users/:id/role
+const updateUserRole = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    
+    if (user) {
+      user.role = req.body.role;
+
+      // Logic: If promoting to Organizer, Assign the Club
+      if (req.body.role === 'organizer') {
+        if (!req.body.managedClub) {
+          return res.status(400).json({ message: "Club/Committee name is required for Organizers." });
+        }
+        user.managedClub = req.body.managedClub;
+      } 
+      // Logic: If demoting to Participant, remove Club
+      else if (req.body.role === 'participant') {
+        user.managedClub = null;
+      }
+
+      const updatedUser = await user.save();
+      res.json({ 
+        _id: updatedUser._id, 
+        role: updatedUser.role, 
+        managedClub: updatedUser.managedClub 
+      });
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// @desc    Get count of pending role requests
+// @route   GET /api/auth/pending-requests
+const getPendingRoleRequestsCount = async (req, res) => {
+  try {
+    const count = await User.countDocuments({
+      role: 'participant',
+      requestedClub: { $ne: null } // requestedClub is NOT null
+    });
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Export these new functions
+module.exports = { registerUser, loginUser, getMe, getAllUsers, updateUserRole,getPendingRoleRequestsCount };
